@@ -244,6 +244,36 @@ const spec: OpenAPIV3.Document = {
         },
       },
     },
+    "/api/wallet": {
+      get: {
+        summary: "Get authenticated user's wallet",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          "200": {
+            description: "Wallet",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    wallet: {
+                      type: "object",
+                      properties: {
+                        id: { type: "string" },
+                        user: { type: "string" },
+                        balance: { type: "number", minimum: 0 },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          "401": { description: "Unauthorized" },
+          "404": { description: "Not found" },
+        },
+      },
+    },
   },
 };
 

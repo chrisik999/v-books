@@ -4,6 +4,7 @@ import { logger, loggerStream } from "./utils/logger";
 import { setupSwagger } from "./swagger";
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
+import walletRoutes from "./routes/wallet.routes";
 
 function server(app: Express) {
   logger.info("Setting up server routes and middleware");
@@ -41,6 +42,8 @@ function server(app: Express) {
   app.use("/api/auth", authRoutes);
   // User routes
   app.use("/api/users", userRoutes);
+  // Wallet routes
+  app.use("/api/wallet", walletRoutes);
 
   // Basic error handler
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
