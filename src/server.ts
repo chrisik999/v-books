@@ -4,6 +4,7 @@ import { logger, loggerStream } from "./utils/logger";
 import { setupSwagger } from "./swagger";
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
+import bookRoutes from "./routes/book.routes";
 import walletRoutes from "./routes/wallet.routes";
 
 function server(app: Express) {
@@ -42,6 +43,8 @@ function server(app: Express) {
   app.use("/api/auth", authRoutes);
   // User routes
   app.use("/api/users", userRoutes);
+  // Book routes
+  app.use("/api/books", bookRoutes);
   // Wallet routes
   app.use("/api/wallet", walletRoutes);
 
