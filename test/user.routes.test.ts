@@ -11,6 +11,12 @@ jest.mock("../src/middleware/validate", () => ({
   validate: () => (_req: any, _res: any, next: any) => next(),
 }));
 
+// Bypass auth middleware for route tests (avoid ESM jose import under Jest)
+jest.mock("../src/middleware/auth.middleware", () => ({
+  __esModule: true,
+  requireAuth: (_req: any, _res: any, next: any) => next(),
+}));
+
 jest.mock("../src/services/user.service", () => ({
   __esModule: true,
   getUserById: jest.fn(async (id) =>

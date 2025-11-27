@@ -10,6 +10,15 @@ const spec: OpenAPIV3.Document = {
     description: "API documentation",
   },
   servers: [{ url: "/" }],
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+      },
+    },
+  },
   paths: {
     "/": {
       get: {
@@ -114,6 +123,7 @@ const spec: OpenAPIV3.Document = {
     "/api/users": {
       get: {
         summary: "List users (paginated)",
+        security: [{ bearerAuth: [] }],
         parameters: [
           {
             name: "page",
@@ -150,6 +160,7 @@ const spec: OpenAPIV3.Document = {
     "/api/users/{id}": {
       get: {
         summary: "Get user by id",
+        security: [{ bearerAuth: [] }],
         parameters: [
           {
             name: "id",
@@ -165,6 +176,7 @@ const spec: OpenAPIV3.Document = {
       },
       patch: {
         summary: "Update user",
+        security: [{ bearerAuth: [] }],
         parameters: [
           {
             name: "id",
@@ -197,6 +209,7 @@ const spec: OpenAPIV3.Document = {
       },
       delete: {
         summary: "Delete user",
+        security: [{ bearerAuth: [] }],
         parameters: [
           {
             name: "id",
