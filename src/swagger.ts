@@ -50,6 +50,60 @@ const spec: OpenAPIV3.Document = {
         },
       },
     },
+    "/api/auth/register": {
+      post: {
+        summary: "Register a new user",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["email", "phone", "firstName", "lastName", "username", "password"],
+                properties: {
+                  email: { type: "string", format: "email" },
+                  phone: { type: "string" },
+                  firstName: { type: "string" },
+                  lastName: { type: "string" },
+                  username: { type: "string" },
+                  password: { type: "string", maxLength: 20 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "201": { description: "Created" },
+          "409": { description: "Conflict - unique constraint" },
+          "400": { description: "Bad request" },
+        },
+      },
+    },
+    "/api/auth/login": {
+      post: {
+        summary: "Login with username or email and password",
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["usernameOrEmail", "password"],
+                properties: {
+                  usernameOrEmail: { type: "string" },
+                  password: { type: "string", maxLength: 20 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": { description: "OK" },
+          "401": { description: "Unauthorized" },
+          "400": { description: "Bad request" },
+        },
+      },
+    },
   },
 };
 

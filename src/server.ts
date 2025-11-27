@@ -2,6 +2,7 @@ import { Express, NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import { logger, loggerStream } from "./utils/logger";
 import { setupSwagger } from "./swagger";
+import authRoutes from "./routes/auth.routes";
 
 function server(app: Express) {
   logger.info("Setting up server routes and middleware");
@@ -34,6 +35,9 @@ function server(app: Express) {
   app.get("/health", (req: Request, res: Response) => {
     res.json({ status: "ok", uptime: process.uptime() });
   });
+
+  // Auth routes
+  app.use("/api/auth", authRoutes);
 
   // Basic error handler
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
