@@ -3,6 +3,12 @@ import { createUser, validateCredentials } from "../services/auth.service";
 import { RegisterInput, LoginInput } from "../schemas/auth.schema";
 import { signAccessToken } from "../utils/jwt.util";
 
+/*
+ * User registration controller
+ *
+ * Handles user registration by creating a new user in the database.
+ * It hashes the password and ensures no sensitive information is returned.
+ */
 export async function register(
   req: Request<unknown, unknown, RegisterInput>,
   res: Response
@@ -18,6 +24,11 @@ export async function register(
   }
 }
 
+/*
+ * User login controller
+ *
+ * Handles user login by validating credentials and returns a JWT token.
+ */
 export async function login(
   req: Request<unknown, unknown, LoginInput>,
   res: Response
