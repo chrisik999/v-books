@@ -1,13 +1,27 @@
 import { Express, NextFunction, Request, Response } from "express";
+import morgan from "morgan";
+import { logger, loggerStream } from "./utils/logger";
 
 function server(app: Express) {
-  console.log("Setting up server routes and middleware");
+  logger.info("Setting up server routes and middleware");
+
+  // HTTP access logs via morgan -> winston
+  morgan.token("req-id", (req) => (req as any).id || "-");
+  app.use(
+    morgan(
+      ":method :url :status :res[content-length] - :response-time ms reqId=:req-id",
+      {
+        stream: loggerStream,
+      }
+    )
+  );
 
   // Middleware example: simple request logging
   app.use((req: Request, _res: Response, next: NextFunction) => {
-    console.log(`${req.method} ${req.path}`);
+    logger.debug(`${req.method} ${req.path}`);
     next();
   });
+
   // Simple typed request handlers
   app.get("/", (req: Request, res: Response) => {
     res.json({ message: "Hello from Express + TypeScript" });
@@ -19,8 +33,12 @@ function server(app: Express) {
 
   // Basic error handler
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    console.error(err);
     const status = err?.status || 500;
+    logger.error("Unhandled error", {
+      status,
+      message: err?.message,
+      stack: err?.stack,
+    });
     res.status(status).json({ error: err?.message || "Internal Server Error" });
   });
 }
