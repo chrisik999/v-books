@@ -27,7 +27,7 @@ export async function login(
   if (!user) return res.status(401).json({ error: "Invalid credentials" });
 
   const token = await signAccessToken({
-    sub: user.id,
+    sub: String(user._id),
     username: user.username,
   });
   return res.json({ token });
