@@ -15,9 +15,20 @@ export interface IBook extends Document {
 const BookSchema = new Schema<IBook>(
   {
     author: { type: String, required: true, trim: true },
-    isbn: { type: String, required: true, unique: true, index: true, trim: true },
+    isbn: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+      trim: true,
+    },
     price: { type: Number, required: true, min: 0 },
-    uploadedBy: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
+    uploadedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
     genre: { type: String, trim: true },
     imagePath: { type: String },
     pdfPath: { type: String },

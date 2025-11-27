@@ -20,130 +20,166 @@ const spec: OpenAPIV3.Document = {
     },
   },
   paths: {
-        "/api/books": {
-          get: {
-            summary: "List books (paginated)",
-            security: [{ bearerAuth: [] }],
-            parameters: [
-              { name: "page", in: "query", schema: { type: "integer", minimum: 1 } },
-              { name: "limit", in: "query", schema: { type: "integer", minimum: 1, maximum: 100 } },
-            ],
-            responses: {
-              "200": {
-                description: "Paginated books",
-                content: {
-                  "application/json": {
-                    schema: {
-                      type: "object",
-                      properties: {
-                        data: { type: "array", items: { type: "object" } },
-                        total: { type: "integer" },
-                        page: { type: "integer" },
-                        limit: { type: "integer" },
-                      },
-                    },
-                  },
-                },
-              },
-            },
+    "/api/books": {
+      get: {
+        summary: "List books (paginated)",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "page",
+            in: "query",
+            schema: { type: "integer", minimum: 1 },
           },
-          post: {
-            summary: "Create a book",
-            security: [{ bearerAuth: [] }],
-            requestBody: {
-              required: true,
-              content: {
-                "multipart/form-data": {
-                  schema: {
-                    type: "object",
-                    required: ["author", "isbn", "price"],
-                    properties: {
-                      author: { type: "string" },
-                      isbn: { type: "string" },
-                      price: { type: "number", minimum: 0 },
-                      genre: { type: "string" },
-                      image: { type: "string", format: "binary" },
-                      pdf: { type: "string", format: "binary" },
-                    },
+          {
+            name: "limit",
+            in: "query",
+            schema: { type: "integer", minimum: 1, maximum: 100 },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Paginated books",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    data: { type: "array", items: { type: "object" } },
+                    total: { type: "integer" },
+                    page: { type: "integer" },
+                    limit: { type: "integer" },
                   },
                 },
               },
-            },
-            responses: {
-              "201": { description: "Created" },
-              "409": { description: "Conflict - ISBN exists" },
-              "400": { description: "Bad request" },
             },
           },
         },
-        "/api/books/{id}": {
-          get: {
-            summary: "Get book by id",
-            security: [{ bearerAuth: [] }],
-            parameters: [ { name: "id", in: "path", required: true, schema: { type: "string" } } ],
-            responses: { "200": { description: "OK" }, "404": { description: "Not found" } },
-          },
-          patch: {
-            summary: "Update book",
-            security: [{ bearerAuth: [] }],
-            parameters: [ { name: "id", in: "path", required: true, schema: { type: "string" } } ],
-            requestBody: {
-              required: false,
-              content: {
-                "multipart/form-data": {
-                  schema: {
-                    type: "object",
-                    properties: {
-                      author: { type: "string" },
-                      isbn: { type: "string" },
-                      price: { type: "number", minimum: 0 },
-                      genre: { type: "string" },
-                      image: { type: "string", format: "binary" },
-                      pdf: { type: "string", format: "binary" },
-                    },
-                  },
+      },
+      post: {
+        summary: "Create a book",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                required: ["author", "isbn", "price"],
+                properties: {
+                  author: { type: "string" },
+                  isbn: { type: "string" },
+                  price: { type: "number", minimum: 0 },
+                  genre: { type: "string" },
+                  image: { type: "string", format: "binary" },
+                  pdf: { type: "string", format: "binary" },
                 },
               },
             },
-            responses: {
-              "200": { description: "Updated" },
-              "403": { description: "Forbidden" },
-              "404": { description: "Not found" },
-              "409": { description: "Conflict - ISBN exists" },
-            },
-          },
-          delete: {
-            summary: "Delete book",
-            security: [{ bearerAuth: [] }],
-            parameters: [ { name: "id", in: "path", required: true, schema: { type: "string" } } ],
-            responses: { "200": { description: "Deleted" }, "403": { description: "Forbidden" }, "404": { description: "Not found" } },
           },
         },
-        "/api/books/delete-many": {
-          post: {
-            summary: "Delete multiple books",
-            security: [{ bearerAuth: [] }],
-            requestBody: {
-              required: true,
-              content: {
-                "application/json": {
-                  schema: {
-                    type: "object",
-                    required: ["ids"],
-                    properties: {
-                      ids: { type: "array", items: { type: "string" } },
-                    },
-                  },
+        responses: {
+          "201": { description: "Created" },
+          "409": { description: "Conflict - ISBN exists" },
+          "400": { description: "Bad request" },
+        },
+      },
+    },
+    "/api/books/{id}": {
+      get: {
+        summary: "Get book by id",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        responses: {
+          "200": { description: "OK" },
+          "404": { description: "Not found" },
+        },
+      },
+      patch: {
+        summary: "Update book",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        requestBody: {
+          required: false,
+          content: {
+            "multipart/form-data": {
+              schema: {
+                type: "object",
+                properties: {
+                  author: { type: "string" },
+                  isbn: { type: "string" },
+                  price: { type: "number", minimum: 0 },
+                  genre: { type: "string" },
+                  image: { type: "string", format: "binary" },
+                  pdf: { type: "string", format: "binary" },
                 },
               },
             },
-            responses: {
-              "200": { description: "Deleted count returned" },
-              "401": { description: "Unauthorized" },
-              "400": { description: "Bad request" },
+          },
+        },
+        responses: {
+          "200": { description: "Updated" },
+          "403": { description: "Forbidden" },
+          "404": { description: "Not found" },
+          "409": { description: "Conflict - ISBN exists" },
+        },
+      },
+      delete: {
+        summary: "Delete book",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string" },
+          },
+        ],
+        responses: {
+          "200": { description: "Deleted" },
+          "403": { description: "Forbidden" },
+          "404": { description: "Not found" },
+        },
+      },
+    },
+    "/api/books/delete-many": {
+      post: {
+        summary: "Delete multiple books",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["ids"],
+                properties: {
+                  ids: { type: "array", items: { type: "string" } },
+                },
+              },
             },
           },
         },
+        responses: {
+          "200": { description: "Deleted count returned" },
+          "401": { description: "Unauthorized" },
+          "400": { description: "Bad request" },
+        },
+      },
+    },
     "/": {
       get: {
         summary: "Root message",
