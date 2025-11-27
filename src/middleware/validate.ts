@@ -37,7 +37,8 @@ export function validate(schemas: Schemas) {
             details: formatZodError(result.error),
           });
         }
-        req.query = result.data as any;
+        // Avoid reassigning req.query (getter-only in some Express versions)
+        Object.assign(req.query as any, result.data as object);
       }
 
       if (schemas.params) {
@@ -48,7 +49,8 @@ export function validate(schemas: Schemas) {
             details: formatZodError(result.error),
           });
         }
-        req.params = result.data as any;
+        // Keep req.params reference; merge validated values
+        Object.assign(req.params as any, result.data as object);
       }
 
       return next();
