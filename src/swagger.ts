@@ -107,6 +107,18 @@ const spec: OpenAPIV3.Document = {
                     },
                   },
                 },
+                example: {
+                  user: {
+                    id: "u1",
+                    email: "test@example.com",
+                    username: "testuser",
+                  },
+                  wallet: {
+                    id: "w1",
+                    user: "u1",
+                    balance: 20,
+                  },
+                },
               },
             },
           },
@@ -264,6 +276,13 @@ const spec: OpenAPIV3.Document = {
                         balance: { type: "number", minimum: 0 },
                       },
                     },
+                  },
+                },
+                example: {
+                  wallet: {
+                    id: "w1",
+                    user: "u1",
+                    balance: 20,
                   },
                 },
               },
