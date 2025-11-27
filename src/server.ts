@@ -1,6 +1,7 @@
 import { Express, NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import { logger, loggerStream } from "./utils/logger";
+import { setupSwagger } from "./swagger";
 
 function server(app: Express) {
   logger.info("Setting up server routes and middleware");
@@ -21,6 +22,9 @@ function server(app: Express) {
     logger.debug(`${req.method} ${req.path}`);
     next();
   });
+
+  // Swagger UI at /docs and raw spec at /openapi.json
+  setupSwagger(app);
 
   // Simple typed request handlers
   app.get("/", (req: Request, res: Response) => {
