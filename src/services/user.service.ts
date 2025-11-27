@@ -1,5 +1,6 @@
 import { QueryFilter } from "mongoose";
 import { userRepository } from "../repositories/user.repository";
+import { IUser } from "../models/user.model";
 
 export async function getUserById(id: string) {
   return userRepository.getById(id);
@@ -12,7 +13,7 @@ export async function listUsers(params: {
 }) {
   const page = Math.max(1, Number(params.page ?? 1));
   const limit = Math.min(100, Math.max(1, Number(params.limit ?? 10)));
-  const filter: QueryFilter<any> = {};
+  const filter: QueryFilter<IUser> = {};
   if (params.q) {
     const rx = new RegExp(params.q, "i");
     filter.$or = [
