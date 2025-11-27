@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { AnyZodObject, ZodError } from "zod";
+import { ZodType, ZodError } from "zod";
 
 type Schemas = {
-  body?: AnyZodObject;
-  query?: AnyZodObject;
-  params?: AnyZodObject;
+  body?: ZodType<unknown>;
+  query?: ZodType<unknown>;
+  params?: ZodType<unknown>;
 };
 
 function formatZodError(err: ZodError) {
