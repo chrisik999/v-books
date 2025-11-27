@@ -1,10 +1,4 @@
-import request from "supertest";
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import compress from "compression";
-import authRoutes from "../src/routes/auth.routes";
-
+// Place mocks before importing route module.
 jest.mock("../src/services/auth.service", () => ({
   __esModule: true,
   createUser: jest.fn(async (body) => ({
@@ -15,10 +9,24 @@ jest.mock("../src/services/auth.service", () => ({
   ),
 }));
 
+jest.mock("../src/models/wallet.model", () => ({
+  __esModule: true,
+  Wallet: {
+    findOne: jest.fn(async () => ({ id: "w1", user: "u1", balance: 20 })),
+  },
+}));
+
 jest.mock("../src/utils/jwt.util", () => ({
   __esModule: true,
   signAccessToken: jest.fn(async () => "mock-token"),
 }));
+
+import request from "supertest";
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import compress from "compression";
+import authRoutes from "../src/routes/auth.routes";
 
 function makeApp() {
   const app = express();
@@ -48,6 +56,7 @@ describe("Auth Routes (supertest)", () => {
       email: "test@example.com",
       username: "testuser",
     });
+    expect(res.body.wallet).toMatchObject({ user: "u1", balance: 20 });
   });
 
   test("POST /api/auth/register -> 400 when invalid body", async () => {

@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { createUser, validateCredentials } from "../services/auth.service";
+import { Wallet } from "../models/wallet.model";
 import { RegisterInput, LoginInput } from "../schemas/auth.schema";
 import { signAccessToken } from "../utils/jwt.util";
 
@@ -16,7 +17,13 @@ export async function register(
   try {
     const user = await createUser(req.body);
     const { passwordHash, ...safe } = user.toObject();
-    return res.status(201).json({ user: safe });
+    // Retrieve wallet (created during service) to include in response if exists
+    const walletDoc = await Wallet.findOne({ user: user._id });
+    const wallet =
+      walletDoc && typeof (walletDoc as any).toObject === "function"
+        ? (walletDoc as any).toObject()
+        : walletDoc;
+    return res.status(201).json({ user: safe, wallet });
   } catch (err: any) {
     const msg = err?.message || "Registration failed";
     const status = /exists/i.test(msg) ? 409 : 400;

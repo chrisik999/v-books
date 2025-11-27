@@ -89,7 +89,27 @@ const spec: OpenAPIV3.Document = {
           },
         },
         responses: {
-          "201": { description: "Created" },
+          "201": {
+            description: "Created with wallet",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    user: { type: "object" },
+                    wallet: {
+                      type: "object",
+                      properties: {
+                        id: { type: "string" },
+                        user: { type: "string" },
+                        balance: { type: "number", minimum: 0 },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
           "409": { description: "Conflict - unique constraint" },
           "400": { description: "Bad request" },
         },

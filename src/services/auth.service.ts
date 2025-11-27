@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import { User, IUser } from "../models/user.model";
+import { Wallet } from "../models/wallet.model";
 import { RegisterInput } from "../schemas/auth.schema";
 import { logger } from "../utils/logger";
 
@@ -12,6 +13,12 @@ export async function createUser(input: RegisterInput): Promise<IUser> {
 
   try {
     const doc = await User.create({ ...rest, passwordHash });
+    // Create associated wallet with default balance 20
+    try {
+      await Wallet.create({ user: doc._id, balance: 20 });
+    } catch (walletErr: any) {
+      logger.error("Error creating wallet", { message: walletErr?.message });
+    }
     return doc;
   } catch (err: any) {
     // Handle duplicate key errors from Mongo (E11000)

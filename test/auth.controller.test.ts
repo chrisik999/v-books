@@ -1,15 +1,23 @@
-import { register, login } from "../src/controllers/auth.controller";
-
+// Mocks must be declared before importing controller to ensure they apply.
 jest.mock("../src/services/auth.service", () => ({
   __esModule: true,
   createUser: jest.fn(),
   validateCredentials: jest.fn(),
 }));
 
+jest.mock("../src/models/wallet.model", () => ({
+  __esModule: true,
+  Wallet: {
+    findOne: jest.fn(async () => ({ id: "w1", user: "u1", balance: 20 })),
+  },
+}));
+
 jest.mock("../src/utils/jwt.util", () => ({
   __esModule: true,
   signAccessToken: jest.fn(async () => "mock-token"),
 }));
+
+import { register, login } from "../src/controllers/auth.controller";
 
 import { createUser, validateCredentials } from "../src/services/auth.service";
 import { signAccessToken } from "../src/utils/jwt.util";
@@ -60,6 +68,7 @@ describe("Auth Controller - register", () => {
       username: "testuser",
     });
     expect(res.body.user).not.toHaveProperty("passwordHash");
+    expect(res.body.wallet).toMatchObject({ user: "u1", balance: 20 });
   });
 
   test("409 on duplicate field", async () => {
