@@ -1,7 +1,7 @@
-import bcrypt from 'bcrypt';
-import { User, IUser } from '../models/user.model';
-import { RegisterInput } from '../schemas/auth.schema';
-import { logger } from '../utils/logger';
+import bcrypt from "bcrypt";
+import { User, IUser } from "../models/user.model";
+import { RegisterInput } from "../schemas/auth.schema";
+import { logger } from "../utils/logger";
 
 const SALT_ROUNDS = 10;
 
@@ -16,15 +16,18 @@ export async function createUser(input: RegisterInput): Promise<IUser> {
   } catch (err: any) {
     // Handle duplicate key errors from Mongo (E11000)
     if (err && err.code === 11000) {
-      const dupField = Object.keys(err.keyPattern || {})[0] || 'field';
+      const dupField = Object.keys(err.keyPattern || {})[0] || "field";
       throw new Error(`${dupField} already exists`);
     }
-    logger.error('Error creating user', { message: err?.message });
+    logger.error("Error creating user", { message: err?.message });
     throw err;
   }
 }
 
-export async function validateCredentials(usernameOrEmail: string, password: string): Promise<IUser | null> {
+export async function validateCredentials(
+  usernameOrEmail: string,
+  password: string
+): Promise<IUser | null> {
   const user = await User.findOne({
     $or: [
       { email: usernameOrEmail.toLowerCase() },

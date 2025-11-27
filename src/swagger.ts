@@ -59,7 +59,14 @@ const spec: OpenAPIV3.Document = {
             "application/json": {
               schema: {
                 type: "object",
-                required: ["email", "phone", "firstName", "lastName", "username", "password"],
+                required: [
+                  "email",
+                  "phone",
+                  "firstName",
+                  "lastName",
+                  "username",
+                  "password",
+                ],
                 properties: {
                   email: { type: "string", format: "email" },
                   phone: { type: "string" },

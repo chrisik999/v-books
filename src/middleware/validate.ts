@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from 'express';
-import { AnyZodObject, ZodError } from 'zod';
+import { NextFunction, Request, Response } from "express";
+import { AnyZodObject, ZodError } from "zod";
 
 type Schemas = {
   body?: AnyZodObject;
@@ -9,7 +9,7 @@ type Schemas = {
 
 function formatZodError(err: ZodError) {
   return err.issues.map((i) => ({
-    path: i.path.join('.'),
+    path: i.path.join("."),
     message: i.message,
     code: i.code,
   }));
@@ -21,7 +21,12 @@ export function validate(schemas: Schemas) {
       if (schemas.body) {
         const result = schemas.body.safeParse(req.body);
         if (!result.success) {
-          return res.status(400).json({ error: 'Invalid body', details: formatZodError(result.error) });
+          return res
+            .status(400)
+            .json({
+              error: "Invalid body",
+              details: formatZodError(result.error),
+            });
         }
         req.body = result.data;
       }
@@ -29,7 +34,12 @@ export function validate(schemas: Schemas) {
       if (schemas.query) {
         const result = schemas.query.safeParse(req.query);
         if (!result.success) {
-          return res.status(400).json({ error: 'Invalid query', details: formatZodError(result.error) });
+          return res
+            .status(400)
+            .json({
+              error: "Invalid query",
+              details: formatZodError(result.error),
+            });
         }
         req.query = result.data as any;
       }
@@ -37,7 +47,12 @@ export function validate(schemas: Schemas) {
       if (schemas.params) {
         const result = schemas.params.safeParse(req.params);
         if (!result.success) {
-          return res.status(400).json({ error: 'Invalid params', details: formatZodError(result.error) });
+          return res
+            .status(400)
+            .json({
+              error: "Invalid params",
+              details: formatZodError(result.error),
+            });
         }
         req.params = result.data as any;
       }
