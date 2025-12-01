@@ -163,8 +163,16 @@ const spec: OpenAPIV3.Document = {
         summary: "List books uploaded by the authenticated user",
         security: [{ bearerAuth: [] }],
         parameters: [
-          { name: "page", in: "query", schema: { type: "integer", minimum: 1 } },
-          { name: "limit", in: "query", schema: { type: "integer", minimum: 1, maximum: 100 } },
+          {
+            name: "page",
+            in: "query",
+            schema: { type: "integer", minimum: 1 },
+          },
+          {
+            name: "limit",
+            in: "query",
+            schema: { type: "integer", minimum: 1, maximum: 100 },
+          },
         ],
         responses: {
           "200": {
@@ -290,7 +298,9 @@ const spec: OpenAPIV3.Document = {
           "200": {
             description: "Deleted",
             content: {
-              "application/json": { schema: { $ref: "#/components/schemas/DeleteResponse" } },
+              "application/json": {
+                schema: { $ref: "#/components/schemas/DeleteResponse" },
+              },
             },
           },
           "403": { description: "Forbidden" },
@@ -320,7 +330,9 @@ const spec: OpenAPIV3.Document = {
           "200": {
             description: "Deleted count returned",
             content: {
-              "application/json": { schema: { $ref: "#/components/schemas/DeleteManyResponse" } },
+              "application/json": {
+                schema: { $ref: "#/components/schemas/DeleteManyResponse" },
+              },
             },
           },
           "401": { description: "Unauthorized" },

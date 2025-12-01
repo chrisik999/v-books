@@ -59,7 +59,12 @@ router.get(
   validate({ query: listQuery }),
   listMyBooksHandler
 );
-router.get("/:id", requireAuth, validate({ params: bookIdParams }), getBookHandler);
+router.get(
+  "/:id",
+  requireAuth,
+  validate({ params: bookIdParams }),
+  getBookHandler
+);
 
 // Create (image + pdf optional)
 router.post(
