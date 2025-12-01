@@ -18,6 +18,52 @@ const spec: OpenAPIV3.Document = {
         bearerFormat: "JWT",
       },
     },
+    schemas: {
+      UploadedBy: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          firstName: { type: "string" },
+          lastName: { type: "string" },
+        },
+      },
+      Book: {
+        type: "object",
+        properties: {
+          id: { type: "string" },
+          author: { type: "string" },
+          isbn: { type: "string" },
+          price: { type: "number", minimum: 0 },
+          genre: { type: "string" },
+          imagePath: { type: "string" },
+          pdfPath: { type: "string" },
+          uploadedBy: { $ref: "#/components/schemas/UploadedBy" },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+        },
+      },
+      BookResponse: {
+        type: "object",
+        properties: { book: { $ref: "#/components/schemas/Book" } },
+      },
+      BookListResponse: {
+        type: "object",
+        properties: {
+          data: { type: "array", items: { $ref: "#/components/schemas/Book" } },
+          total: { type: "integer" },
+          page: { type: "integer" },
+          limit: { type: "integer" },
+        },
+      },
+      DeleteResponse: {
+        type: "object",
+        properties: { deleted: { type: "boolean" } },
+      },
+      DeleteManyResponse: {
+        type: "object",
+        properties: { deletedCount: { type: "integer" } },
+      },
+    },
   },
   paths: {
     "/api/books": {
@@ -41,14 +87,23 @@ const spec: OpenAPIV3.Document = {
             description: "Paginated books",
             content: {
               "application/json": {
-                schema: {
-                  type: "object",
-                  properties: {
-                    data: { type: "array", items: { type: "object" } },
-                    total: { type: "integer" },
-                    page: { type: "integer" },
-                    limit: { type: "integer" },
-                  },
+                schema: { $ref: "#/components/schemas/BookListResponse" },
+                example: {
+                  data: [
+                    {
+                      id: "b1",
+                      author: "Jane Doe",
+                      isbn: "9781234567890",
+                      price: 9.99,
+                      genre: "Fiction",
+                      imagePath: "uploads/images/cover.jpg",
+                      pdfPath: "uploads/pdfs/book.pdf",
+                      uploadedBy: { id: "u1", firstName: "A", lastName: "B" },
+                    },
+                  ],
+                  total: 1,
+                  page: 1,
+                  limit: 10,
                 },
               },
             },
@@ -78,9 +133,66 @@ const spec: OpenAPIV3.Document = {
           },
         },
         responses: {
-          "201": { description: "Created" },
+          "201": {
+            description: "Created",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/BookResponse" },
+                example: {
+                  book: {
+                    id: "b1",
+                    author: "Jane Doe",
+                    isbn: "9781234567890",
+                    price: 9.99,
+                    genre: "Fiction",
+                    imagePath: "uploads/images/cover.jpg",
+                    pdfPath: "uploads/pdfs/book.pdf",
+                    uploadedBy: { id: "u1", firstName: "A", lastName: "B" },
+                  },
+                },
+              },
+            },
+          },
           "409": { description: "Conflict - ISBN exists" },
           "400": { description: "Bad request" },
+        },
+      },
+    },
+    "/api/books/mine": {
+      get: {
+        summary: "List books uploaded by the authenticated user",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: "page", in: "query", schema: { type: "integer", minimum: 1 } },
+          { name: "limit", in: "query", schema: { type: "integer", minimum: 1, maximum: 100 } },
+        ],
+        responses: {
+          "200": {
+            description: "Paginated books",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/BookListResponse" },
+                example: {
+                  data: [
+                    {
+                      id: "b1",
+                      author: "Jane Doe",
+                      isbn: "9781234567890",
+                      price: 9.99,
+                      genre: "Fiction",
+                      imagePath: "uploads/images/cover.jpg",
+                      pdfPath: "uploads/pdfs/book.pdf",
+                      uploadedBy: { id: "u1", firstName: "A", lastName: "B" },
+                    },
+                  ],
+                  total: 1,
+                  page: 1,
+                  limit: 10,
+                },
+              },
+            },
+          },
+          "401": { description: "Unauthorized" },
         },
       },
     },
@@ -97,7 +209,26 @@ const spec: OpenAPIV3.Document = {
           },
         ],
         responses: {
-          "200": { description: "OK" },
+          "200": {
+            description: "OK",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/BookResponse" },
+                example: {
+                  book: {
+                    id: "b1",
+                    author: "Jane Doe",
+                    isbn: "9781234567890",
+                    price: 9.99,
+                    genre: "Fiction",
+                    imagePath: "uploads/images/cover.jpg",
+                    pdfPath: "uploads/pdfs/book.pdf",
+                    uploadedBy: { id: "u1", firstName: "A", lastName: "B" },
+                  },
+                },
+              },
+            },
+          },
           "404": { description: "Not found" },
         },
       },
@@ -131,7 +262,14 @@ const spec: OpenAPIV3.Document = {
           },
         },
         responses: {
-          "200": { description: "Updated" },
+          "200": {
+            description: "Updated",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/BookResponse" },
+              },
+            },
+          },
           "403": { description: "Forbidden" },
           "404": { description: "Not found" },
           "409": { description: "Conflict - ISBN exists" },
@@ -149,7 +287,12 @@ const spec: OpenAPIV3.Document = {
           },
         ],
         responses: {
-          "200": { description: "Deleted" },
+          "200": {
+            description: "Deleted",
+            content: {
+              "application/json": { schema: { $ref: "#/components/schemas/DeleteResponse" } },
+            },
+          },
           "403": { description: "Forbidden" },
           "404": { description: "Not found" },
         },
@@ -174,7 +317,12 @@ const spec: OpenAPIV3.Document = {
           },
         },
         responses: {
-          "200": { description: "Deleted count returned" },
+          "200": {
+            description: "Deleted count returned",
+            content: {
+              "application/json": { schema: { $ref: "#/components/schemas/DeleteManyResponse" } },
+            },
+          },
           "401": { description: "Unauthorized" },
           "400": { description: "Bad request" },
         },

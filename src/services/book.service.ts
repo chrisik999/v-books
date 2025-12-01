@@ -1,8 +1,9 @@
-import { Book, IBook } from "../models/book.model";
+import { IBook } from "../models/book.model";
+import { BookRepository } from "../repositories/book.repository";
 
 export async function createBook(data: Partial<IBook>): Promise<IBook> {
-  const doc = await Book.create(data);
-  return doc;
+  const doc = await BookRepository.create(data);
+  return doc as IBook;
 }
 
 export async function listBooks(query: {
@@ -13,36 +14,43 @@ export async function listBooks(query: {
   const limit = Math.min(100, Math.max(1, query.limit || 10));
   const skip = (page - 1) * limit;
   const [data, total] = await Promise.all([
-    Book.find()
-      .skip(skip)
-      .limit(limit)
-      .populate({ path: "uploadedBy", select: "firstName lastName" })
-      .lean(),
-    Book.countDocuments(),
+    BookRepository.list({}, page, limit),
+    BookRepository.count({}),
+  ]);
+  return { data, total, page, limit };
+}
+
+export async function listBooksByUser(
+  userId: string,
+  query: { page?: number; limit?: number }
+): Promise<{ data: any[]; total: number; page: number; limit: number }> {
+  const page = Math.max(1, query.page || 1);
+  const limit = Math.min(100, Math.max(1, query.limit || 10));
+  const [data, total] = await Promise.all([
+    BookRepository.list({ uploadedBy: userId } as any, page, limit),
+    BookRepository.count({ uploadedBy: userId } as any),
   ]);
   return { data, total, page, limit };
 }
 
 export async function getBookById(id: string): Promise<IBook | null> {
-  return Book.findById(id)
-    .populate({ path: "uploadedBy", select: "firstName lastName" })
-    .exec();
+  return BookRepository.findById(id) as any;
 }
 
 export async function updateBookById(
   id: string,
   updates: Partial<IBook>
 ): Promise<IBook | null> {
-  return Book.findByIdAndUpdate(id, { $set: updates }, { new: true }).exec();
+  return BookRepository.updateById(id, { $set: updates } as any) as any;
 }
 
 export async function deleteBookById(id: string): Promise<IBook | null> {
-  return Book.findByIdAndDelete(id).exec();
+  return BookRepository.deleteById(id) as any;
 }
 
 export async function deleteBooksByIds(
   ids: string[]
 ): Promise<{ deletedCount: number }> {
-  const res = await Book.deleteMany({ _id: { $in: ids } }).exec();
+  const res = await BookRepository.deleteManyByIds(ids);
   return { deletedCount: res.deletedCount || 0 };
 }

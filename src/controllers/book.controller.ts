@@ -3,6 +3,7 @@ import path from "path";
 import {
   createBook,
   listBooks,
+  listBooksByUser,
   getBookById,
   updateBookById,
   deleteBookById,
@@ -56,6 +57,15 @@ export async function listBooksHandler(req: Request, res: Response) {
   const page = Number(req.query.page || 1);
   const limit = Number(req.query.limit || 10);
   const result = await listBooks({ page, limit });
+  return res.json(result);
+}
+
+export async function listMyBooksHandler(req: Request, res: Response) {
+  const userId = getUserId(req);
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+  const page = Number(req.query.page || 1);
+  const limit = Number(req.query.limit || 10);
+  const result = await listBooksByUser(userId, { page, limit });
   return res.json(result);
 }
 
