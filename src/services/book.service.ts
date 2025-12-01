@@ -54,3 +54,7 @@ export async function deleteBooksByIds(
   const res = await BookRepository.deleteManyByIds(ids);
   return { deletedCount: res.deletedCount || 0 };
 }
+
+export async function findBooks(filter: any): Promise<IBook[]> {
+  return (await BookRepository.findMany(filter)) as any;
+}

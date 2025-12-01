@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import path from "path";
+import path from "node:path";
+import { safeUnlinkMany } from "../utils/file.util";
 import {
   createBook,
   listBooks,
@@ -132,6 +133,7 @@ export async function deleteBookHandler(req: Request, res: Response) {
     return res.status(403).json({ error: "Forbidden" });
 
   await deleteBookById(id);
+  await safeUnlinkMany([current.imagePath, current.pdfPath]);
   return res.json({ deleted: true });
 }
 
@@ -144,18 +146,27 @@ export async function deleteBooksManyHandler(req: Request, res: Response) {
   if (!Array.isArray(ids) || ids.length === 0)
     return res.status(400).json({ error: "ids required" });
 
-  if (role !== "ADMIN") {
-    // Non-admin may only delete own books; filter ids
-    const own = await Promise.all(
-      ids.map(async (id) => {
-        const b = await getBookById(id);
-        return b && String(b.uploadedBy) === String(userId) ? id : null;
-      })
+  // Build filter based on role
+  const filter: any = { _id: { $in: ids } };
+  if (role !== "ADMIN") filter.uploadedBy = userId;
+
+  // Fetch matching books for cleanup
+  try {
+    const { findBooks } = await import("../services/book.service");
+    const books = await findBooks(filter);
+    await Promise.all(
+      (books as any[]).map((b) =>
+        safeUnlinkMany([
+          b.imagePath as string | undefined,
+          b.pdfPath as string | undefined,
+        ])
+      )
     );
-    const filtered = own.filter(Boolean) as string[];
-    const result = await deleteBooksByIds(filtered);
+    const keptIds = (books as any[]).map((b) => String(b._id));
+    const result = await deleteBooksByIds(keptIds);
     return res.json({ deletedCount: result.deletedCount });
-  } else {
+  } catch {
+    // If something goes wrong, still attempt deletion without cleanup
     const result = await deleteBooksByIds(ids);
     return res.json({ deletedCount: result.deletedCount });
   }

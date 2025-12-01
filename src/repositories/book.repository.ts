@@ -27,6 +27,8 @@ export const BookRepository = {
   count: (filter: QueryFilter<IBook> = {}) =>
     Book.countDocuments(filter).exec(),
 
+  findMany: (filter: QueryFilter<IBook>) => Book.find(filter).exec(),
+
   updateById: (id: string, updates: UpdateQuery<IBook>) =>
     Book.findByIdAndUpdate(id, updates, { new: true })
       .populate({ path: "uploadedBy", select: "firstName lastName" })
